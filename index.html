@@ -662,35 +662,38 @@
         {
             section: 'Speaking',
             title: 'Speaking Section - Exercise 1 (Read Aloud)',
+            type: 'speaking',
+            id: 'sp_ex1',
             content: `<p><strong>Read aloud clearly:</strong></p>
             <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid var(--border); margin: 15px 0; font-style: italic;">
                 "Learning a second language opens countless doors to personal and professional growth. Consistent practice, clear pronunciation, and daily immersion are the keys to achieving true fluency and confidence."
             </div>
-            <button class="btn" id="recBtn_s1" onclick="toggleSpeakingRecording('s1')">🔴 Iniciar Grabación (Ejercicio 1)</button>
-            <p id="status_s1" style="font-size: 0.85rem; color: var(--text-light); margin-top: 8px;"></p>`,
-            type: 'speaking', id: 'sp_ex1'
+            <button class="btn" id="recBtn_sp_ex1" onclick="toggleSpeakingRecording('sp_ex1')">🔴 Iniciar Grabación (Ejercicio 1)</button>
+            <p id="status_sp_ex1" style="font-size: 0.85rem; color: var(--text-light); margin-top: 8px;"></p>`
         },
         {
             section: 'Speaking',
             title: 'Speaking Section - Exercise 2 (Personal Experience)',
+            type: 'speaking',
+            id: 'sp_ex2',
             content: `<p><strong>Prompt:</strong></p>
             <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid var(--border); margin: 15px 0;">
                 "Talk about your last weekend or vacation. What did you do, where did you go, and how did you feel?"
             </div>
-            <button class="btn" id="recBtn_s2" onclick="toggleSpeakingRecording('s2')">🔴 Iniciar Grabación (Ejercicio 2)</button>
-            <p id="status_s2" style="font-size: 0.85rem; color: var(--text-light); margin-top: 8px;"></p>`,
-            type: 'speaking', id: 'sp_ex2'
+            <button class="btn" id="recBtn_sp_ex2" onclick="toggleSpeakingRecording('sp_ex2')">🔴 Iniciar Grabación (Ejercicio 2)</button>
+            <p id="status_sp_ex2" style="font-size: 0.85rem; color: var(--text-light); margin-top: 8px;"></p>`
         },
         {
             section: 'Speaking',
             title: 'Speaking Section - Exercise 3 (Opinion)',
+            type: 'speaking',
+            id: 'sp_ex3',
             content: `<p><strong>Prompt:</strong></p>
             <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid var(--border); margin: 15px 0;">
                 "Describe one of the biggest challenges you have faced in your career and how you overcame it."
             </div>
-            <button class="btn" id="recBtn_s3" onclick="toggleSpeakingRecording('s3')">🔴 Iniciar Grabación (Ejercicio 3)</button>
-            <p id="status_s3" style="font-size: 0.85rem; color: var(--text-light); margin-top: 8px;"></p>`,
-            type: 'speaking', id: 'sp_ex3'
+            <button class="btn" id="recBtn_sp_ex3" onclick="toggleSpeakingRecording('sp_ex3')">🔴 Iniciar Grabación (Ejercicio 3)</button>
+            <p id="status_sp_ex3" style="font-size: 0.85rem; color: var(--text-light); margin-top: 8px;"></p>`
         }
     ];
 
@@ -771,7 +774,7 @@
 
     function toggleSpeakingRecording(id) {
         const btn = document.getElementById(`recBtn_${id}`);
-        const status = document.getElementById(`status_s${id.slice(1)}`);
+        const status = document.getElementById(`status_${id}`);
         
         if (!activeMediaRecorders[id]) {
             navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
@@ -845,12 +848,11 @@
         localStorage.setItem('placement_answers', JSON.stringify(answers));
     }
 
-    // NUEVA FUNCIÓN DE VALIDACIÓN ANTES DE AVANZAR
+    // VALIDACIÓN ESTRICTA E INVIOLABLE
     function validateCurrentQuestion() {
         const item = examQuestions[currentQuestionIndex];
 
         if (item.questions) {
-            // Verificar si alguna sub-pregunta de opción múltiple se quedó sin marcar
             for (let qObj of item.questions) {
                 if (answers[qObj.id] === undefined || answers[qObj.id] === null) {
                     alert('⚠️ Por favor responde todas las preguntas de esta sección antes de continuar.');
@@ -858,14 +860,12 @@
                 }
             }
         } else if (item.type === 'textarea') {
-            // Verificar si el cuadro de texto está vacío o muy corto
             const val = answers[item.id];
             if (!val || val.trim().length === 0) {
                 alert('⚠️ Por favor escribe tu respuesta en el cuadro de texto antes de continuar.');
                 return false;
             }
         } else if (item.type === 'speaking') {
-            // Verificar si se grabó el audio para este ejercicio
             if (!speakingRecordings[item.id]) {
                 alert('⚠️ Por favor realiza y guarda la grabación de audio antes de continuar.');
                 return false;
@@ -875,7 +875,6 @@
     }
 
     function nextQuestion() {
-        // Validar antes de permitir avanzar
         if (!validateCurrentQuestion()) {
             return;
         }
