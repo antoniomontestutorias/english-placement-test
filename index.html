@@ -17,6 +17,7 @@
             --text-light: #64748b;
             --border: #cbd5e1;
             --success: #10b981;
+            --error: #ef4444;
         }
 
         * {
@@ -276,7 +277,6 @@
             margin-top: 15px;
         }
 
-        /* CONFIGURACIÓN DE IMPRESIÓN LIMPIA */
         @media print {
             body {
                 background: white !important;
@@ -702,7 +702,7 @@
         const city = document.getElementById('city').value.trim();
 
         if (!name || !email || !phone || !country || !city) {
-            alert('Por favor completa todos los campos.');
+            alert('Por favor completa todos los campos de registro.');
             return;
         }
 
@@ -727,7 +727,7 @@
             statusMsg.textContent = "✅ Audio de prueba reproducido correctamente.";
         } catch (e) {
             statusMsg.textContent = "❌ Error al reproducir audio.";
-            statusMsg.style.color = "#ef4444";
+            statusMsg.style.color = "var(--error)";
         }
     }
 
@@ -752,7 +752,7 @@
                 mediaRecorderTest.start();
                 isRecordingTest = true;
                 btn.textContent = '⏹️ Detener Grabación';
-                btn.style.background = '#ef4444';
+                btn.style.background = 'var(--error)';
                 statusMsg.textContent = "🎤 Grabando...";
             }).catch(() => {
                 alert('Acceso al micrófono denegado.');
@@ -780,12 +780,13 @@
                 recorder.ondataavailable = e => chunks.push(e.data);
                 recorder.onstop = () => {
                     speakingRecordings[id] = new Blob(chunks, { type: 'audio/webm' });
-                    status.textContent = '✅ Grabación guardada.';
+                    status.textContent = '✅ Grabación guardada correctamente.';
+                    status.style.color = 'var(--success)';
                 };
                 recorder.start();
                 activeMediaRecorders[id] = { recorder, stream };
                 btn.textContent = '⏹️ Detener Grabación';
-                btn.style.background = '#ef4444';
+                btn.style.background = 'var(--error)';
                 status.textContent = '🔴 Grabando...';
             }).catch(() => alert('Error de micrófono.'));
         } else {
@@ -828,7 +829,7 @@
             });
         } else if (item.type === 'textarea') {
             const val = answers[item.id] || '';
-            html += `<div style="margin-top: 15px;"><textarea rows="5" placeholder="Escribe tu respuesta..." oninput="saveAnswer('${item.id}', this.value)">${val}</textarea></div>`;
+            html += `<div style="margin-top: 15px;"><textarea rows="5" placeholder="Escribe tu respuesta aquí..." oninput="saveAnswer('${item.id}', this.value)">${val}</textarea></div>`;
         }
 
         html += `</div>`;
@@ -844,7 +845,41 @@
         localStorage.setItem('placement_answers', JSON.stringify(answers));
     }
 
+    // NUEVA FUNCIÓN DE VALIDACIÓN ANTES DE AVANZAR
+    function validateCurrentQuestion() {
+        const item = examQuestions[currentQuestionIndex];
+
+        if (item.questions) {
+            // Verificar si alguna sub-pregunta de opción múltiple se quedó sin marcar
+            for (let qObj of item.questions) {
+                if (answers[qObj.id] === undefined || answers[qObj.id] === null) {
+                    alert('⚠️ Por favor responde todas las preguntas de esta sección antes de continuar.');
+                    return false;
+                }
+            }
+        } else if (item.type === 'textarea') {
+            // Verificar si el cuadro de texto está vacío o muy corto
+            const val = answers[item.id];
+            if (!val || val.trim().length === 0) {
+                alert('⚠️ Por favor escribe tu respuesta en el cuadro de texto antes de continuar.');
+                return false;
+            }
+        } else if (item.type === 'speaking') {
+            // Verificar si se grabó el audio para este ejercicio
+            if (!speakingRecordings[item.id]) {
+                alert('⚠️ Por favor realiza y guarda la grabación de audio antes de continuar.');
+                return false;
+            }
+        }
+        return true;
+    }
+
     function nextQuestion() {
+        // Validar antes de permitir avanzar
+        if (!validateCurrentQuestion()) {
+            return;
+        }
+
         if (currentQuestionIndex < examQuestions.length - 1) {
             currentQuestionIndex++;
             localStorage.setItem('placement_index', currentQuestionIndex);
