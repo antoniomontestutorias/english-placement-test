@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>English Placement Test - Antonio Montes Tutoring</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -227,29 +226,21 @@
             border-top: 2px solid var(--border);
         }
 
-        /* Report Styles for PDF (Diseño optimizado para impresión perfecta) */
+        /* Report Styles */
         #pdf-report {
             background: white;
-            padding: 20px;
+            padding: 10px;
             color: var(--text-main);
             width: 100%;
         }
 
         .report-header {
-            display: table;
-            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             border-bottom: 3px solid var(--brand-dark);
             padding-bottom: 15px;
             margin-bottom: 20px;
-        }
-
-        .report-header-left, .report-header-right {
-            display: table-cell;
-            vertical-align: middle;
-        }
-
-        .report-header-right {
-            text-align: right;
         }
 
         .report-section {
@@ -285,10 +276,29 @@
             margin-top: 15px;
         }
 
+        /* CONFIGURACIÓN DE IMPRESIÓN LIMPIA */
         @media print {
-            body { background: white; padding: 0; }
-            .container { box-shadow: none; border: none; }
-            .no-print { display: none !important; }
+            body {
+                background: white !important;
+                padding: 0 !important;
+            }
+            body * {
+                visibility: hidden;
+            }
+            #pdf-report, #pdf-report * {
+                visibility: visible;
+            }
+            #pdf-report {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                margin: 0;
+                padding: 15px;
+            }
+            .no-print {
+                display: none !important;
+            }
         }
     </style>
 </head>
@@ -372,11 +382,11 @@
     <div id="step-report" class="section-content hidden">
         <div id="pdf-report">
             <div class="report-header">
-                <div class="report-header-left">
+                <div>
                     <h2>Informe General de Diagnóstico</h2>
                     <p style="color: var(--text-light); font-size: 0.85rem;">Official 4-Skill Language Proficiency Assessment</p>
                 </div>
-                <div class="report-header-right">
+                <div style="text-align: right;">
                     <span id="reportLevelBadge" style="background: var(--brand-accent); color: var(--brand-dark); padding: 6px 14px; border-radius: 20px; font-weight: bold; font-size: 1rem;">NIVEL: B1</span>
                     <p style="font-size: 0.75rem; color: var(--text-light); margin-top: 4px;" id="reportDate"></p>
                 </div>
@@ -436,7 +446,7 @@
         </div>
 
         <div style="margin-top: 30px; text-align: center;" class="no-print">
-            <button class="btn btn-accent" onclick="downloadPDF()">Descargar Informe en PDF</button>
+            <button class="btn btn-accent" onclick="downloadPDF()">🖨️ Imprimir / Guardar como PDF</button>
         </div>
     </div>
 </div>
@@ -448,7 +458,6 @@
     let mediaRecorderTest;
     let audioChunksTest = [];
 
-    // Cargar progreso guardado al iniciar si existe
     window.onload = function() {
         const savedData = localStorage.getItem('placement_student');
         const savedAnswers = localStorage.getItem('placement_answers');
@@ -467,7 +476,6 @@
         }
         if (savedIndex && parseInt(savedIndex) > 0) {
             currentQuestionIndex = parseInt(savedIndex);
-            // Si ya iba por el examen, saltar directo al examen
             document.getElementById('step-data').classList.add('hidden');
             document.getElementById('step-exam').classList.remove('hidden');
             renderCurrentQuestion();
@@ -903,7 +911,6 @@
             ? "Basado en tu ubicación (Sincelejo), te recomendamos: <strong>Paquete Presencial o Mixto (2 o 3 veces/semana)</strong> para mayor inmersión."
             : `Basado en tu ubicación (${studentData.city}), te recomendamos idealmente nuestros servicios online: <strong>Paquete Virtual (3 veces/semana)</strong> o <strong>Clase Particular (Virtual)</strong>.`;
 
-        // Limpiar memoria temporal al terminar el examen
         localStorage.removeItem('placement_student');
         localStorage.removeItem('placement_answers');
         localStorage.removeItem('placement_index');
@@ -912,14 +919,7 @@
     }
 
     function downloadPDF() {
-        const element = document.getElementById('pdf-report');
-        html2pdf().from(element).set({
-            margin: 10,
-            filename: `Informe_${studentData.name.replace(/\s+/g, '_')}.pdf`,
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2, useCORS: true },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        }).save();
+        window.print();
     }
 </script>
 
