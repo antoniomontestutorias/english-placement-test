@@ -782,9 +782,16 @@
                 let recorder = new MediaRecorder(stream);
                 recorder.ondataavailable = e => chunks.push(e.data);
                 recorder.onstop = () => {
-                    speakingRecordings[id] = new Blob(chunks, { type: 'audio/webm' });
-                    status.textContent = '✅ Grabación guardada correctamente.';
-                    status.style.color = 'var(--success)';
+                    const blob = new Blob(chunks, { type: 'audio/webm' });
+                    if (blob.size > 1000) {
+                        speakingRecordings[id] = blob;
+                        status.textContent = '✅ Grabación guardada correctamente.';
+                        status.style.color = 'var(--success)';
+                    } else {
+                        status.textContent = '⚠️ Grabación muy corta o vacía. Por favor vuelve a grabar.';
+                        status.style.color = 'var(--error)';
+                        speakingRecordings[id] = null;
+                    }
                 };
                 recorder.start();
                 activeMediaRecorders[id] = { recorder, stream };
@@ -848,7 +855,6 @@
         localStorage.setItem('placement_answers', JSON.stringify(answers));
     }
 
-    // VALIDACIÓN ESTRICTA E INVIOLABLE
     function validateCurrentQuestion() {
         const item = examQuestions[currentQuestionIndex];
 
@@ -866,8 +872,8 @@
                 return false;
             }
         } else if (item.type === 'speaking') {
-            if (!speakingRecordings[item.id]) {
-                alert('⚠️ Por favor realiza y guarda la grabación de audio antes de continuar.');
+            if (!speakingRecordings[item.id] || speakingRecordings[item.id].size < 1000) {
+                alert('⚠️ Por favor realiza y guarda una grabación de audio válida antes de continuar.');
                 return false;
             }
         }
@@ -917,8 +923,11 @@
         });
         const scoreWriting = Math.round((wf / wc) * 85) + 15;
 
+        // CÁLCULO DE SPEAKING: Si completa los 3 es 85, parcial 60, y por defecto no pasa de 40
         let sd = 0;
-        ['sp_ex1', 'sp_ex2', 'sp_ex3'].forEach(id => { if (speakingRecordings[id]) sd++; });
+        ['sp_ex1', 'sp_ex2', 'sp_ex3'].forEach(id => { 
+            if (speakingRecordings[id] && speakingRecordings[id].size > 1000) sd++; 
+        });
         const scoreSpeaking = sd === 3 ? 85 : (sd > 0 ? 60 : 40);
 
         const overall = Math.round((scoreReading + scoreWriting + scoreListening + scoreSpeaking) / 4);
