@@ -382,7 +382,7 @@
         </div>
     </div>
 
-    <!-- STEP 2: TECHNICAL CHECK -->
+    <!-- STEP 2: TECHNICAL CHECK WITH SPEECH-TO-TEXT -->
     <div id="step-tech" class="section-content hidden">
         <h2 style="color: var(--brand-dark); margin-bottom: 8px;">Verificación Técnica</h2>
         <p style="color: var(--text-light); margin-bottom: 25px;">Asegúrate de que tu sonido y micrófono funcionan correctamente antes de comenzar.</p>
@@ -394,10 +394,14 @@
         </div>
 
         <div class="question-card">
-            <h3>2. Verificación de Micrófono</h3>
-            <p style="font-size: 0.95rem; margin-bottom: 12px; color: var(--text-light);">Haz clic en el botón, di algo breve y detén la grabación para escucharte.</p>
-            <button class="btn" id="recTestBtn" onclick="toggleTestRecording()">🔴 Iniciar Grabación de Prueba</button>
+            <h3>2. Verificación de Micrófono y Transcripción en Vivo</h3>
+            <p style="font-size: 0.95rem; margin-bottom: 8px; color: var(--text-light);">Haz clic en iniciar, di en voz alta algo sencillo en español (por ejemplo: <em>"Probando micrófono de la plataforma"</em>) y verifica que aparezca escrito abajo.</p>
+            <button class="btn" id="recTestBtn" onclick="toggleTestRecording()">🔴 Iniciar Prueba de Voz</button>
             <p id="micStatusMsg" style="font-size: 0.9rem; color: var(--text-light); margin-top: 10px; font-weight: 600;"></p>
+            
+            <label style="margin-top: 15px;">Texto detectado en tiempo real:</label>
+            <div id="transcript_test" class="transcript-box"></div>
+            
             <audio id="testAudioPlayback" controls class="hidden" style="margin-top: 15px;"></audio>
         </div>
 
@@ -487,6 +491,7 @@
     let answers = {};
     let mediaRecorderTest;
     let audioChunksTest = [];
+    let testRecognition = null;
 
     window.onload = function() {
         const savedData = localStorage.getItem('placement_student');
@@ -516,7 +521,7 @@
         // READING
         {
             section: 'Reading',
-            title: 'Reading Section - Text 1 (Sencillo)',
+            title: 'Reading Section - Text 1',
             content: `<strong>Read the email below and answer the questions:</strong><br><br>
             <em>Hi Anna, I am having a wonderful time in Cartagena. The weather is warm and sunny every day. Yesterday, I visited the historic Walled City and took pictures. Tomorrow, I am going to Playa Blanca to swim in the ocean. See you soon! - David</em>`,
             questions: [
@@ -529,7 +534,7 @@
         },
         {
             section: 'Reading',
-            title: 'Reading Section - Text 2 (Intermedio)',
+            title: 'Reading Section - Text 2',
             content: `<strong>Read the article excerpt and answer the questions:</strong><br><br>
             <em>Remote work has radically transformed the modern labor market. Employees no longer depend strictly on physical offices, allowing companies to recruit global talent and professionals to balance work and personal life more efficiently.</em>`,
             questions: [
@@ -542,7 +547,7 @@
         },
         {
             section: 'Reading',
-            title: 'Reading Section - Text 3 (Avanzado)',
+            title: 'Reading Section - Text 3',
             content: `<strong>Read the text and answer the questions:</strong><br><br>
             <em>The proliferation of digital platforms has fundamentally altered consumer behavior, engendering an era where immediacy supersedes brand loyalty. Consumers demand seamless digital experiences and hyper-personalized recommendations.</em>`,
             questions: [
@@ -557,78 +562,78 @@
         // WRITING
         {
             section: 'Writing',
-            title: 'Writing Section - Exercise 1 (Mujer en Oficina)',
-            content: `<img src="images/1.jpg" class="writing-img" alt="Mujer en oficina">
-            <p><strong>Look at the image.</strong> Write a short paragraph (3-4 sentences) describing what the woman is doing, her clothing, and her working environment using present continuous.</p>`,
+            title: 'Writing Section - Exercise 1',
+            content: `<img src="images/1.jpg" class="writing-img" alt="Exercise 1">
+            <p><strong>Look at the image and write a short paragraph (3-4 sentences) describing what the woman is doing, her clothing, and her working environment using present continuous:</strong></p>`,
             type: 'textarea', id: 'w_ex1'
         },
         {
             section: 'Writing',
-            title: 'Writing Section - Exercise 2 (Hombre en Terminal)',
-            content: `<img src="images/2.jpg" class="writing-img" alt="Hombre en terminal">
-            <p><strong>Look at the image.</strong> Describe the person in the terminal, what they are holding, and travel plans.</p>`,
+            title: 'Writing Section - Exercise 2',
+            content: `<img src="images/2.jpg" class="writing-img" alt="Exercise 2">
+            <p><strong>Look at the image and describe the person in the terminal, what they are holding, and travel plans:</strong></p>`,
             type: 'textarea', id: 'w_ex2'
         },
         {
             section: 'Writing',
-            title: 'Writing Section - Exercise 3 (Joven en el Parque)',
-            content: `<img src="images/3.jpg" class="writing-img" alt="Joven en el parque">
-            <p><strong>Look at the image.</strong> Describe the person walking in the park under the rain, their clothing, and weather conditions.</p>`,
+            title: 'Writing Section - Exercise 3',
+            content: `<img src="images/3.jpg" class="writing-img" alt="Exercise 3">
+            <p><strong>Look at the image and describe the person walking in the park under the rain, their clothing, and weather conditions:</strong></p>`,
             type: 'textarea', id: 'w_ex3'
         },
         {
             section: 'Writing',
-            title: 'Writing Section - Exercise 4 (Señora Mayor con Perro)',
-            content: `<img src="images/4.jpg" class="writing-img" alt="Señora mayor con perro">
-            <p><strong>Look at the image.</strong> Describe the elderly person and their dog in the public square. Include interaction and clothing details.</p>`,
+            title: 'Writing Section - Exercise 4',
+            content: `<img src="images/4.jpg" class="writing-img" alt="Exercise 4">
+            <p><strong>Look at the image and describe the elderly person and their dog in the public square, including interaction and clothing details:</strong></p>`,
             type: 'textarea', id: 'w_ex4'
         },
         {
             section: 'Writing',
-            title: 'Writing Section - Exercise 5 (Grammar Correction)',
-            content: `<p><strong>Correct the sentence:</strong><br><em>"She don't likes play tennis on the weekends because she are very busy."</em></p>`,
+            title: 'Writing Section - Exercise 5',
+            content: `<p><strong>Correct the grammar error in the sentence:</strong><br><em>"She don't likes play tennis on the weekends because she are very busy."</em></p>`,
             type: 'textarea', id: 'w_ex5'
         },
         {
             section: 'Writing',
-            title: 'Writing Section - Exercise 6 (Past Tense)',
-            content: `<p><strong>Transform into Simple Past:</strong><br><em>"They go to the supermarket every afternoon and buy fresh vegetables."</em></p>`,
+            title: 'Writing Section - Exercise 6',
+            content: `<p><strong>Transform the sentence into Simple Past:</strong><br><em>"They go to the supermarket every afternoon and buy fresh vegetables."</em></p>`,
             type: 'textarea', id: 'w_ex6'
         },
         {
             section: 'Writing',
-            title: 'Writing Section - Exercise 7 (Modals)',
-            content: `<p><strong>Complete using a modal verb:</strong><br><em>"If you want to pass your English test, you ________ study grammar every day."</em></p>`,
+            title: 'Writing Section - Exercise 7',
+            content: `<p><strong>Complete the sentence using a suitable modal verb:</strong><br><em>"If you want to pass your English test, you ________ study grammar every day."</em></p>`,
             type: 'textarea', id: 'w_ex7'
         },
         {
             section: 'Writing',
-            title: 'Writing Section - Exercise 8 (Conditionals)',
-            content: `<p><strong>Complete the sentence:</strong><br><em>"If I had the opportunity to travel anywhere right now, I ________..."</em></p>`,
+            title: 'Writing Section - Exercise 8',
+            content: `<p><strong>Complete the sentence using conditionals:</strong><br><em>"If I had the opportunity to travel anywhere right now, I ________..."</em></p>`,
             type: 'textarea', id: 'w_ex8'
         },
         {
             section: 'Writing',
-            title: 'Writing Section - Exercise 9 (Email)',
-            content: `<p><strong>Write a short professional email (3-4 lines)</strong> asking for English private tutoring information.</p>`,
+            title: 'Writing Section - Exercise 9',
+            content: `<p><strong>Write a short professional email (3-4 lines) asking for English private tutoring information:</strong></p>`,
             type: 'textarea', id: 'w_ex9'
         },
         {
             section: 'Writing',
-            title: 'Writing Section - Exercise 10 (Anecdote)',
-            content: `<p><strong>Briefly describe what you did last weekend</strong> in past tense.</p>`,
+            title: 'Writing Section - Exercise 10',
+            content: `<p><strong>Briefly describe what you did last weekend using past tense:</strong></p>`,
             type: 'textarea', id: 'w_ex10'
         },
         {
             section: 'Writing',
-            title: 'Writing Section - Exercise 11 (Opinion)',
-            content: `<p><strong>Why is learning English essential</strong> for your career? Write 3 lines.</p>`,
+            title: 'Writing Section - Exercise 11',
+            content: `<p><strong>Explain in 3 lines why learning English is essential for your career:</strong></p>`,
             type: 'textarea', id: 'w_ex11'
         },
         {
             section: 'Writing',
-            title: 'Writing Section - Exercise 12 (Future Goals)',
-            content: `<p><strong>What are your goals for the next 5 years?</strong> Use future tenses.</p>`,
+            title: 'Writing Section - Exercise 12',
+            content: `<p><strong>What are your goals for the next 5 years? Write them using future tenses:</strong></p>`,
             type: 'textarea', id: 'w_ex12',
             futureStructures: ['will', 'going to', "'ll", 'plan to', 'hope to', 'aim to', 'would like to', 'am to'],
             goalVerbs: ['graduate', 'work', 'travel', 'buy', 'learn', 'build', 'start', 'create', 'study', 'move', 'get', 'become', 'achieve', 'finish', 'establish']
@@ -639,10 +644,10 @@
             section: 'Listening',
             title: 'Listening Section - Audio 1 (Dictation & Transcription)',
             content: `<div class="audio-container">
-                <p><strong>Listen to Audio 1 carefully:</strong></p>
+                <p><strong>Listen to Audio 1 carefully and transcribe what you hear:</strong></p>
                 <audio controls src="audios/audio1.mp3"></audio>
                 <p style="font-size: 0.9rem; color: var(--text-light); margin-top: 10px;">
-                    📝 <em>Instrucción: Escucha el audio y escribe a continuación la transcripción de lo que escuchas. No te preocupes por la puntuación o mayúsculas.</em>
+                    <em>(Escucha el audio y escribe a continuación la transcripción exacta de lo que escuchas en el cuadro de abajo).</em>
                 </p>
             </div>`,
             type: 'transcription',
@@ -651,9 +656,9 @@
         },
         {
             section: 'Listening',
-            title: 'Listening Section - Audio 2 (Laura\'s Future Business)',
+            title: 'Listening Section - Audio 2',
             content: `<div class="audio-container">
-                <p><strong>Listen to Audio 2:</strong></p>
+                <p><strong>Listen to Audio 2 and answer the questions:</strong></p>
                 <audio controls src="audios/audio2.mp3"></audio>
             </div>`,
             questions: [
@@ -669,9 +674,9 @@
         },
         {
             section: 'Listening',
-            title: 'Listening Section - Audio 3 (Luna and Blue\'s Family Farm)',
+            title: 'Listening Section - Audio 3',
             content: `<div class="audio-container">
-                <p><strong>Listen to Audio 3:</strong></p>
+                <p><strong>Listen to Audio 3 and answer the questions:</strong></p>
                 <audio controls src="audios/audio3.mp3"></audio>
             </div>`,
             questions: [
@@ -689,15 +694,15 @@
         // SPEAKING
         {
             section: 'Speaking',
-            title: 'Speaking Section - Exercise 1 (Read Aloud - Nivel Sencillo)',
+            title: 'Speaking Section - Exercise 1 (Read Aloud)',
             type: 'speaking',
             id: 'sp_ex1',
             maxAttempts: 3,
-            content: `<p><strong>Read aloud clearly (Nivel Sencillo):</strong></p>
+            content: `<p><strong>Read aloud the following text clearly:</strong></p>
             <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid var(--border); margin: 15px 0; font-style: italic;">
-                "Hello, my name is a student. I like to study English every day. My favorite color is blue and I live in a warm city."
+                "Hello everyone. My name is a student. I like to study English every morning, drink a cup of coffee, and read interesting articles."
             </div>
-            <p style="font-size: 0.85rem; color: var(--error); font-weight: 600; margin-bottom: 10px;">⚠️ Tienes un máximo de 3 intentos para grabar este ejercicio.</p>
+            <p style="font-size: 0.85rem; color: var(--error); font-weight: 600; margin-bottom: 10px;">⚠️ You have a maximum of 3 attempts to record this exercise. (Máximo 3 intentos)</p>
             <button class="btn" id="recBtn_sp_ex1" onclick="toggleSpeakingRecording('sp_ex1')">🔴 Iniciar Grabación (Intento 1/3)</button>
             <p id="status_sp_ex1" style="font-size: 0.85rem; color: var(--text-light); margin-top: 8px;"></p>
             <label style="margin-top: 15px;">Transcripción en vivo (Speech-to-Text):</label>
@@ -705,15 +710,15 @@
         },
         {
             section: 'Speaking',
-            title: 'Speaking Section - Exercise 2 (Personal Experience - Nivel Intermedio)',
+            title: 'Speaking Section - Exercise 2 (Read Aloud)',
             type: 'speaking',
             id: 'sp_ex2',
             maxAttempts: 3,
-            content: `<p><strong>Prompt (Nivel Intermedio):</strong></p>
-            <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid var(--border); margin: 15px 0;">
-                "Talk about your daily routine. What time do you wake up, what do you usually eat for breakfast, and what activities do you do in the afternoon?"
+            content: `<p><strong>Read aloud the following intermediate text clearly:</strong></p>
+            <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid var(--border); margin: 15px 0; font-style: italic;">
+                "Successful professionals understand that continuous learning is essential for career growth. Adapting to new technologies and improving communication skills help us achieve our long-term goals more efficiently."
             </div>
-            <p style="font-size: 0.85rem; color: var(--error); font-weight: 600; margin-bottom: 10px;">⚠️ Tienes un máximo de 3 intentos para grabar este ejercicio.</p>
+            <p style="font-size: 0.85rem; color: var(--error); font-weight: 600; margin-bottom: 10px;">⚠️ You have a maximum of 3 attempts to record this exercise. (Máximo 3 intentos)</p>
             <button class="btn" id="recBtn_sp_ex2" onclick="toggleSpeakingRecording('sp_ex2')">🔴 Iniciar Grabación (Intento 1/3)</button>
             <p id="status_sp_ex2" style="font-size: 0.85rem; color: var(--text-light); margin-top: 8px;"></p>
             <label style="margin-top: 15px;">Transcripción en vivo (Speech-to-Text):</label>
@@ -721,15 +726,15 @@
         },
         {
             section: 'Speaking',
-            title: 'Speaking Section - Exercise 3 (Open Expression - Expresión Libre)',
+            title: 'Speaking Section - Exercise 3 (Open Expression)',
             type: 'speaking',
             id: 'sp_ex3',
             maxAttempts: 999,
-            content: `<p><strong>Prompt (Expresión Libre):</strong></p>
+            content: `<p><strong>Speak freely about the following prompt:</strong></p>
             <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid var(--border); margin: 15px 0;">
                 "Describe one of the biggest challenges you have faced in your personal or professional life and how you managed to overcome it."
             </div>
-            <p style="font-size: 0.85rem; color: var(--success); font-weight: 600; margin-bottom: 10px;">🔄 Puedes realizar los intentos que desees para este ejercicio libre.</p>
+            <p style="font-size: 0.85rem; color: var(--success); font-weight: 600; margin-bottom: 10px;">🔄 You can make as many attempts as you wish for this open exercise. (Intentos ilimitados)</p>
             <button class="btn" id="recBtn_sp_ex3" onclick="toggleSpeakingRecording('sp_ex3')">🔴 Iniciar Grabación</button>
             <p id="status_sp_ex3" style="font-size: 0.85rem; color: var(--text-light); margin-top: 8px;"></p>
             <label style="margin-top: 15px;">Transcripción en vivo (Speech-to-Text):</label>
@@ -779,6 +784,9 @@
         const btn = document.getElementById('recTestBtn');
         const statusMsg = document.getElementById('micStatusMsg');
         const playback = document.getElementById('testAudioPlayback');
+        const transcriptBox = document.getElementById('transcript_test');
+
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
         if (!isRecordingTest) {
             navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
@@ -789,22 +797,44 @@
                     const blob = new Blob(audioChunksTest, { type: 'audio/webm' });
                     playback.src = URL.createObjectURL(blob);
                     playback.classList.remove('hidden');
-                    statusMsg.textContent = "✅ ¡Micrófono funcionando! Puedes escuchar tu grabación.";
+                    statusMsg.textContent = "✅ ¡Micrófono y transcripción verificados con éxito!";
                     statusMsg.style.color = "var(--success)";
                 };
                 mediaRecorderTest.start();
                 isRecordingTest = true;
-                btn.textContent = '⏹️ Detener Grabación';
+                btn.textContent = '⏹️ Detener Prueba';
                 btn.style.background = 'var(--error)';
-                statusMsg.textContent = "🎤 Grabando...";
+                statusMsg.textContent = "🎤 Grabando y transcribiendo en vivo...";
+
+                if (SpeechRecognition) {
+                    testRecognition = new SpeechRecognition();
+                    testRecognition.lang = 'es-ES';
+                    testRecognition.continuous = true;
+                    testRecognition.interimResults = true;
+
+                    let finalRes = '';
+                    testRecognition.onresult = (e) => {
+                        let interim = '';
+                        for (let i = e.resultIndex; i < e.results.length; ++i) {
+                            if (e.results[i].isFinal) finalRes += e.results[i][0].transcript + ' ';
+                            else interim += e.results[i][0].transcript;
+                        }
+                        transcriptBox.textContent = finalRes + interim;
+                    };
+                    testRecognition.start();
+                } else {
+                    transcriptBox.textContent = "⚠️ Tu navegador no soporta Speech-to-Text en tiempo real, pero el audio se grabará bien.";
+                }
+
             }).catch(() => {
-                alert('Acceso al micrófono denegado.');
+                alert('Acceso al micrófono denegado. Por favor permítelo en tu navegador.');
             });
         } else {
             mediaRecorderTest.stop();
             mediaRecorderTest.stream.getTracks().forEach(track => track.stop());
+            if (testRecognition) testRecognition.stop();
             isRecordingTest = false;
-            btn.textContent = '🔴 Iniciar Grabación de Prueba';
+            btn.textContent = '🔴 Iniciar Prueba de Voz';
             btn.style.background = '';
         }
     }
@@ -899,6 +929,11 @@
             }
             btn.style.background = '';
         }
+    }
+
+    function goToStep(stepId) {
+        document.querySelectorAll('.section-content').forEach(el => el.classList.add('hidden'));
+        document.getElementById(stepId).classList.remove('hidden');
     }
 
     function startTest() {
@@ -1009,14 +1044,12 @@
     }
 
     function finishExam() {
-        // 1. Reading Score
         let rc = 0, rt = 0;
         examQuestions.filter(e => e.section === 'Reading').forEach(item => {
             item.questions.forEach(q => { rt++; if (answers[q.id] === q.correct) rc++; });
         });
         const scoreReading = Math.round((rc / rt) * 100);
 
-        // 2. Listening Score
         let lc = 0, lt = 0;
         examQuestions.filter(e => e.section === 'Listening' && e.questions).forEach(item => {
             item.questions.forEach(q => { lt++; if (answers[q.id] === q.correct) lc++; });
@@ -1036,7 +1069,6 @@
         }
         const scoreListening = Math.round((scoreAudio1 + scoreAudioMC) / 2);
 
-        // 3. Writing Score
         let totalWritingScore = 0;
         let writingExercisesCount = 0;
 
@@ -1071,7 +1103,6 @@
         });
         const scoreWriting = Math.round(totalWritingScore / writingExercisesCount);
 
-        // 4. Speaking Score
         let sd = 0;
         ['sp_ex1', 'sp_ex2', 'sp_ex3'].forEach(id => { 
             if (speakingRecordings[id] && speakingRecordings[id].size > 1000) sd++; 
@@ -1084,7 +1115,6 @@
         document.getElementById('step-exam').classList.add('hidden');
         document.getElementById('step-report').classList.remove('hidden');
 
-        // Actualizar datos visuales del certificado
         document.getElementById('repName').textContent = studentData.name;
         document.getElementById('repLocation').textContent = `${studentData.city}, ${studentData.country}`;
         document.getElementById('reportDate').textContent = new Date().toLocaleDateString();
@@ -1092,7 +1122,6 @@
         document.getElementById('certScoreBig').textContent = `${overall}/100`;
         document.getElementById('certLevelText').textContent = cefrFull;
 
-        // Círculos y etiquetas de habilidades
         document.getElementById('circleReading').textContent = scoreReading;
         document.getElementById('labelReading').textContent = getCefrByScore(scoreReading);
 
