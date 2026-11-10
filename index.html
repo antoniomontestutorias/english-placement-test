@@ -127,6 +127,12 @@
             transform: translateY(-2px);
         }
 
+        .btn:disabled {
+            background-color: var(--border);
+            cursor: not-allowed;
+            transform: none;
+        }
+
         .btn-accent {
             background-color: var(--brand-accent);
             color: var(--brand-dark);
@@ -219,6 +225,17 @@
             margin-bottom: 18px;
         }
 
+        .transcript-box {
+            background: #ffffff;
+            border: 2px dashed var(--border);
+            padding: 12px;
+            border-radius: 10px;
+            margin-top: 10px;
+            font-size: 0.95rem;
+            color: var(--brand-dark);
+            min-height: 50px;
+        }
+
         .nav-buttons {
             display: flex;
             justify-content: space-between;
@@ -227,54 +244,77 @@
             border-top: 2px solid var(--border);
         }
 
-        /* Report Styles */
+        /* CERTIFICATE REPORT STYLES */
         #pdf-report {
             background: white;
-            padding: 10px;
+            padding: 20px;
             color: var(--text-main);
             width: 100%;
+            border: 4px solid var(--brand-dark);
+            border-radius: 16px;
         }
 
-        .report-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 3px solid var(--brand-dark);
-            padding-bottom: 15px;
-            margin-bottom: 20px;
+        .cert-header {
+            text-align: center;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 20px;
+            margin-bottom: 25px;
         }
 
-        .report-section {
-            margin-bottom: 20px;
+        .cert-badge-container {
+            background: linear-gradient(135deg, var(--brand-dark), var(--brand-blue));
+            color: white;
+            text-align: center;
+            padding: 40px 20px;
+            border-radius: 20px;
+            margin: 20px 0 30px 0;
+            box-shadow: 0 10px 25px rgba(7, 17, 30, 0.2);
+            border: 3px solid var(--brand-accent);
         }
 
-        .report-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 15px;
+        .cert-badge-container h2 {
+            font-size: 2.8rem;
+            color: var(--brand-accent);
+            font-weight: 700;
+            margin: 10px 0;
         }
 
-        .report-table td {
-            padding: 8px 10px;
-            border: 1px solid var(--border);
-            font-size: 0.9rem;
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin: 30px 0;
+            text-align: center;
         }
 
-        .report-table th {
+        .skill-card {
             background: #f8fafc;
+            border: 2px solid var(--border);
+            border-radius: 14px;
+            padding: 15px 10px;
+        }
+
+        .skill-circle {
+            width: 65px;
+            height: 65px;
+            border: 4px solid var(--brand-accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px auto;
+            font-weight: 700;
+            font-size: 1.2rem;
             color: var(--brand-dark);
-            padding: 10px;
-            border: 1px solid var(--border);
-            text-align: left;
-            font-size: 0.95rem;
+            background: white;
         }
 
         .recommendation-box {
             background: #fffbeb;
             border: 2px solid #fde68a;
-            padding: 15px;
-            border-radius: 12px;
-            margin-top: 15px;
+            padding: 18px;
+            border-radius: 14px;
+            margin-top: 25px;
         }
 
         @media print {
@@ -294,7 +334,8 @@
                 top: 0;
                 width: 100%;
                 margin: 0;
-                padding: 15px;
+                padding: 10px;
+                border: none;
             }
             .no-print {
                 display: none !important;
@@ -378,75 +419,64 @@
         </div>
     </div>
 
-    <!-- STEP 4: REPORT -->
+    <!-- STEP 4: CERTIFICATE REPORT -->
     <div id="step-report" class="section-content hidden">
         <div id="pdf-report">
-            <div class="report-header">
-                <div>
-                    <h2>Informe General de Diagnóstico</h2>
-                    <p style="color: var(--text-light); font-size: 0.85rem;">Official 4-Skill Language Proficiency Assessment</p>
+            <div class="cert-header">
+                <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-light); letter-spacing: 2px; text-transform: uppercase;">Antonio Montes Tutoring - Certificación de Inglés</span>
+                <h2 style="font-size: 1.8rem; color: var(--brand-dark); margin-top: 5px;" id="repName">Nombre del Estudiante</h2>
+                <p style="font-size: 0.9rem; color: var(--text-light);">Ubicación: <span id="repLocation"></span> | Fecha: <span id="reportDate"></span></p>
+                <p style="font-size: 0.95rem; margin-top: 10px;">Ha completado con éxito la evaluación diagnóstica integral y ha obtenido el nivel oficial:</p>
+            </div>
+
+            <!-- BADGE CERTIFICADO -->
+            <div class="cert-badge-container">
+                <p style="font-size: 0.9rem; letter-spacing: 1.5px; text-transform: uppercase; color: #94a3b8;">Official English Proficiency Score</p>
+                <h2 id="certScoreBig">60/100</h2>
+                <p id="certLevelText" style="font-size: 1.25rem; font-weight: 600; color: #ffffff;">B2 Intermedio Alto</p>
+            </div>
+
+            <!-- DESGLOSE DE HABILIDADES TIPO CERTIFICADO -->
+            <div style="margin-bottom: 20px;">
+                <h3 style="color: var(--brand-dark); font-size: 1.1rem; margin-bottom: 12px; text-align: center;">📊 Desglose por Habilidades (MCER)</h3>
+                <div class="skills-grid">
+                    <div class="skill-card">
+                        <div class="skill-circle" id="circleReading">0</div>
+                        <strong>Leer</strong>
+                        <p style="font-size: 0.8rem; color: var(--text-light); margin-top: 4px;" id="labelReading">B1 Intermedio</p>
+                    </div>
+                    <div class="skill-card">
+                        <div class="skill-circle" id="circleListening">0</div>
+                        <strong>Escuchar</strong>
+                        <p style="font-size: 0.8rem; color: var(--text-light); margin-top: 4px;" id="labelListening">B1 Intermedio</p>
+                    </div>
+                    <div class="skill-card">
+                        <div class="skill-circle" id="circleWriting">0</div>
+                        <strong>Escribir</strong>
+                        <p style="font-size: 0.8rem; color: var(--text-light); margin-top: 4px;" id="labelWriting">B1 Intermedio</p>
+                    </div>
+                    <div class="skill-card">
+                        <div class="skill-circle" id="circleSpeaking">0</div>
+                        <strong>Hablar</strong>
+                        <p style="font-size: 0.8rem; color: var(--text-light); margin-top: 4px;" id="labelSpeaking">A2 Básico</p>
+                    </div>
                 </div>
-                <div style="text-align: right;">
-                    <span id="reportLevelBadge" style="background: var(--brand-accent); color: var(--brand-dark); padding: 6px 14px; border-radius: 20px; font-weight: bold; font-size: 1rem;">NIVEL: B1</span>
-                    <p style="font-size: 0.75rem; color: var(--text-light); margin-top: 4px;" id="reportDate"></p>
-                </div>
             </div>
 
-            <div class="report-section">
-                <table class="report-table">
-                    <tr>
-                        <td><strong>Estudiante:</strong> <span id="repName"></span></td>
-                        <td><strong>Ubicación:</strong> <span id="repLocation"></span></td>
-                    </tr>
-                </table>
-            </div>
-
-            <div class="report-section">
-                <h3 style="color: var(--brand-dark); margin-bottom: 10px; font-size: 1rem;">📊 Desglose de Habilidades (0 - 100)</h3>
-                <table class="report-table">
-                    <tr>
-                        <th>Habilidad</th>
-                        <th>Puntaje</th>
-                        <th>Descripción Breve</th>
-                    </tr>
-                    <tr>
-                        <td><strong>Reading</strong></td>
-                        <td id="scoreReading">0/100</td>
-                        <td>Comprensión lectora general.</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Writing</strong></td>
-                        <td id="scoreWriting">0/100</td>
-                        <td>Producción escrita y estructura.</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Listening</strong></td>
-                        <td id="scoreListening">0/100</td>
-                        <td>Comprensión auditiva.</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Speaking</strong></td>
-                        <td id="scoreSpeaking">0/100</td>
-                        <td>Fluidez y expresión oral.</td>
-                    </tr>
-                </table>
-            </div>
-
-            <div class="report-section">
-                <h3 style="color: var(--brand-dark); margin-bottom: 6px; font-size: 1rem;">📝 Diagnóstico y Capacidades</h3>
-                <p id="abilityDescription" style="font-size: 0.9rem; margin-bottom: 10px;"></p>
-                <h3 style="color: var(--brand-dark); margin-bottom: 6px; font-size: 1rem;">⚠️ Áreas de Mejora</h3>
-                <p id="improvementDescription" style="font-size: 0.9rem;"></p>
+            <div class="report-section" style="background: #f8fafc; padding: 15px; border-radius: 12px; border: 1px solid var(--border);">
+                <h3 style="color: var(--brand-dark); margin-bottom: 6px; font-size: 1rem;">📝 Diagnóstico Pedagógico</h3>
+                <p id="abilityDescription" style="font-size: 0.9rem; margin-bottom: 8px;"></p>
+                <p id="improvementDescription" style="font-size: 0.9rem; color: var(--text-light);"></p>
             </div>
 
             <div class="recommendation-box" id="recommendationBox">
-                <h3 style="color: var(--brand-dark); margin-bottom: 6px; font-size: 1rem;">🎯 Servicio Recomendado</h3>
+                <h3 style="color: var(--brand-dark); margin-bottom: 6px; font-size: 1rem;">🎯 Recomendación de Tutoría Personalizada</h3>
                 <p id="recommendedServiceText" style="font-size: 0.9rem;"></p>
             </div>
         </div>
 
         <div style="margin-top: 30px; text-align: center;" class="no-print">
-            <button class="btn btn-accent" onclick="downloadPDF()">🖨️ Imprimir / Guardar como PDF</button>
+            <button class="btn btn-accent" onclick="downloadPDF()">🖨️ Imprimir / Guardar Certificado en PDF</button>
         </div>
     </div>
 </div>
@@ -599,27 +629,25 @@
             section: 'Writing',
             title: 'Writing Section - Exercise 12 (Future Goals)',
             content: `<p><strong>What are your goals for the next 5 years?</strong> Use future tenses.</p>`,
-            type: 'textarea', id: 'w_ex12'
+            type: 'textarea', id: 'w_ex12',
+            futureStructures: ['will', 'going to', "'ll", 'plan to', 'hope to', 'aim to', 'would like to', 'am to'],
+            goalVerbs: ['graduate', 'work', 'travel', 'buy', 'learn', 'build', 'start', 'create', 'study', 'move', 'get', 'become', 'achieve', 'finish', 'establish']
         },
 
         // LISTENING
         {
             section: 'Listening',
-            title: 'Listening Section - Audio 1 (Alejandro the Musician)',
+            title: 'Listening Section - Audio 1 (Dictation & Transcription)',
             content: `<div class="audio-container">
-                <p><strong>Listen to Audio 1:</strong></p>
+                <p><strong>Listen to Audio 1 carefully:</strong></p>
                 <audio controls src="audios/audio1.mp3"></audio>
+                <p style="font-size: 0.9rem; color: var(--text-light); margin-top: 10px;">
+                    📝 <em>Instrucción: Escucha el audio y escribe a continuación la transcripción de lo que escuchas. No te preocupes por la puntuación o mayúsculas.</em>
+                </p>
             </div>`,
-            questions: [
-                { id: 'l1_q1', q: '1. What instrument does Alejandro play?', options: ['Piano', 'Guitar', 'Drums', 'Violin'], correct: 1 },
-                { id: 'l1_q2', q: '2. Where are his friends?', options: ['Sports team', 'In a band', 'School', 'Work'], correct: 1 },
-                { id: 'l1_q3', q: '3. When do they play music?', options: ['Sunday', 'Saturday', 'Friday', 'Every day'], correct: 1 },
-                { id: 'l1_q4', q: '4. Who sings with the band?', options: ['Mother', 'Sister', 'Friend', 'Cousin'], correct: 1 },
-                { id: 'l1_q5', q: '5. How do they feel when they play?', options: ['Sad', 'Tired', 'Happy', 'Bored'], correct: 2 },
-                { id: 'l1_q6', q: '6. Do they like to perform?', options: ['Yes, they do.', 'No, they don\'t.', 'Sometimes.', 'Unknown.'], correct: 0 },
-                { id: 'l1_q7', q: '7. Does Alejandro practice every day?', options: ['No', 'Yes, he does.', 'Weekends', 'Never'], correct: 1 },
-                { id: 'l1_q8', q: '8. Where are they famous?', options: ['In their town', 'Country', 'Internationally', 'Nowhere'], correct: 0 }
-            ]
+            type: 'transcription',
+            id: 'l1_transcription',
+            referenceWords: ['alejandro', 'musician', 'plays', 'guitar', 'friends', 'band', 'music', 'saturday', 'sister', 'singer', 'sings', 'sometimes', 'happy', 'play', 'perform', 'practice', 'every', 'day', 'famous', 'town', 'love']
         },
         {
             section: 'Listening',
@@ -661,39 +689,51 @@
         // SPEAKING
         {
             section: 'Speaking',
-            title: 'Speaking Section - Exercise 1 (Read Aloud)',
+            title: 'Speaking Section - Exercise 1 (Read Aloud - Nivel Sencillo)',
             type: 'speaking',
             id: 'sp_ex1',
-            content: `<p><strong>Read aloud clearly:</strong></p>
+            maxAttempts: 3,
+            content: `<p><strong>Read aloud clearly (Nivel Sencillo):</strong></p>
             <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid var(--border); margin: 15px 0; font-style: italic;">
-                "Learning a second language opens countless doors to personal and professional growth. Consistent practice, clear pronunciation, and daily immersion are the keys to achieving true fluency and confidence."
+                "Hello, my name is a student. I like to study English every day. My favorite color is blue and I live in a warm city."
             </div>
-            <button class="btn" id="recBtn_sp_ex1" onclick="toggleSpeakingRecording('sp_ex1')">🔴 Iniciar Grabación (Ejercicio 1)</button>
-            <p id="status_sp_ex1" style="font-size: 0.85rem; color: var(--text-light); margin-top: 8px;"></p>`
+            <p style="font-size: 0.85rem; color: var(--error); font-weight: 600; margin-bottom: 10px;">⚠️ Tienes un máximo de 3 intentos para grabar este ejercicio.</p>
+            <button class="btn" id="recBtn_sp_ex1" onclick="toggleSpeakingRecording('sp_ex1')">🔴 Iniciar Grabación (Intento 1/3)</button>
+            <p id="status_sp_ex1" style="font-size: 0.85rem; color: var(--text-light); margin-top: 8px;"></p>
+            <label style="margin-top: 15px;">Transcripción en vivo (Speech-to-Text):</label>
+            <div id="transcript_sp_ex1" class="transcript-box"></div>`
         },
         {
             section: 'Speaking',
-            title: 'Speaking Section - Exercise 2 (Personal Experience)',
+            title: 'Speaking Section - Exercise 2 (Personal Experience - Nivel Intermedio)',
             type: 'speaking',
             id: 'sp_ex2',
-            content: `<p><strong>Prompt:</strong></p>
+            maxAttempts: 3,
+            content: `<p><strong>Prompt (Nivel Intermedio):</strong></p>
             <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid var(--border); margin: 15px 0;">
-                "Talk about your last weekend or vacation. What did you do, where did you go, and how did you feel?"
+                "Talk about your daily routine. What time do you wake up, what do you usually eat for breakfast, and what activities do you do in the afternoon?"
             </div>
-            <button class="btn" id="recBtn_sp_ex2" onclick="toggleSpeakingRecording('sp_ex2')">🔴 Iniciar Grabación (Ejercicio 2)</button>
-            <p id="status_sp_ex2" style="font-size: 0.85rem; color: var(--text-light); margin-top: 8px;"></p>`
+            <p style="font-size: 0.85rem; color: var(--error); font-weight: 600; margin-bottom: 10px;">⚠️ Tienes un máximo de 3 intentos para grabar este ejercicio.</p>
+            <button class="btn" id="recBtn_sp_ex2" onclick="toggleSpeakingRecording('sp_ex2')">🔴 Iniciar Grabación (Intento 1/3)</button>
+            <p id="status_sp_ex2" style="font-size: 0.85rem; color: var(--text-light); margin-top: 8px;"></p>
+            <label style="margin-top: 15px;">Transcripción en vivo (Speech-to-Text):</label>
+            <div id="transcript_sp_ex2" class="transcript-box"></div>`
         },
         {
             section: 'Speaking',
-            title: 'Speaking Section - Exercise 3 (Opinion)',
+            title: 'Speaking Section - Exercise 3 (Open Expression - Expresión Libre)',
             type: 'speaking',
             id: 'sp_ex3',
-            content: `<p><strong>Prompt:</strong></p>
+            maxAttempts: 999,
+            content: `<p><strong>Prompt (Expresión Libre):</strong></p>
             <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid var(--border); margin: 15px 0;">
-                "Describe one of the biggest challenges you have faced in your career and how you overcame it."
+                "Describe one of the biggest challenges you have faced in your personal or professional life and how you managed to overcome it."
             </div>
-            <button class="btn" id="recBtn_sp_ex3" onclick="toggleSpeakingRecording('sp_ex3')">🔴 Iniciar Grabación (Ejercicio 3)</button>
-            <p id="status_sp_ex3" style="font-size: 0.85rem; color: var(--text-light); margin-top: 8px;"></p>`
+            <p style="font-size: 0.85rem; color: var(--success); font-weight: 600; margin-bottom: 10px;">🔄 Puedes realizar los intentos que desees para este ejercicio libre.</p>
+            <button class="btn" id="recBtn_sp_ex3" onclick="toggleSpeakingRecording('sp_ex3')">🔴 Iniciar Grabación</button>
+            <p id="status_sp_ex3" style="font-size: 0.85rem; color: var(--text-light); margin-top: 8px;"></p>
+            <label style="margin-top: 15px;">Transcripción en vivo (Speech-to-Text):</label>
+            <div id="transcript_sp_ex3" class="transcript-box"></div>`
         }
     ];
 
@@ -771,12 +811,21 @@
 
     let speakingRecordings = {};
     let activeMediaRecorders = {};
+    let speakingAttempts = { sp_ex1: 0, sp_ex2: 0, sp_ex3: 0 };
+    let recognitionInstances = {};
 
     function toggleSpeakingRecording(id) {
         const btn = document.getElementById(`recBtn_${id}`);
         const status = document.getElementById(`status_${id}`);
-        
+        const transcriptBox = document.getElementById(`transcript_${id}`);
+        const item = examQuestions.find(e => e.id === id);
+
         if (!activeMediaRecorders[id]) {
+            if (speakingAttempts[id] >= item.maxAttempts) {
+                alert('⚠️ Has alcanzado el límite máximo de 3 intentos permitidos para este ejercicio.');
+                return;
+            }
+
             navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
                 let chunks = [];
                 let recorder = new MediaRecorder(stream);
@@ -785,25 +834,69 @@
                     const blob = new Blob(chunks, { type: 'audio/webm' });
                     if (blob.size > 1000) {
                         speakingRecordings[id] = blob;
-                        status.textContent = '✅ Grabación guardada correctamente.';
+                        status.textContent = '✅ Grabación guardada exitosamente.';
                         status.style.color = 'var(--success)';
                     } else {
-                        status.textContent = '⚠️ Grabación muy corta o vacía. Por favor vuelve a grabar.';
+                        status.textContent = '⚠️ Grabación muy corta o vacía. Inténtalo de nuevo.';
                         status.style.color = 'var(--error)';
-                        speakingRecordings[id] = null;
                     }
                 };
                 recorder.start();
                 activeMediaRecorders[id] = { recorder, stream };
+                
+                speakingAttempts[id]++;
+
                 btn.textContent = '⏹️ Detener Grabación';
                 btn.style.background = 'var(--error)';
-                status.textContent = '🔴 Grabando...';
-            }).catch(() => alert('Error de micrófono.'));
+                status.textContent = `🔴 Grabando intento ${speakingAttempts[id]} de ${item.maxAttempts}...`;
+
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                if (SpeechRecognition) {
+                    const recognition = new SpeechRecognition();
+                    recognition.lang = 'en-US';
+                    recognition.continuous = true;
+                    recognition.interimResults = true;
+
+                    let finalTranscript = '';
+                    recognition.onresult = (event) => {
+                        let interim = '';
+                        for (let i = event.resultIndex; i < event.results.length; ++i) {
+                            if (event.results[i].isFinal) {
+                                finalTranscript += event.results[i][0].transcript + ' ';
+                            } else {
+                                interim += event.results[i][0].transcript;
+                            }
+                        }
+                        transcriptBox.textContent = finalTranscript + interim;
+                        answers[`transcript_${id}`] = finalTranscript;
+                    };
+                    recognition.start();
+                    recognitionInstances[id] = recognition;
+                } else {
+                    transcriptBox.textContent = "(El navegador no soporta transcripción automática en vivo, pero tu audio se está guardando correctamente).";
+                }
+
+            }).catch(() => alert('Error de acceso al micrófono.'));
         } else {
             activeMediaRecorders[id].recorder.stop();
             activeMediaRecorders[id].stream.getTracks().forEach(t => t.stop());
             activeMediaRecorders[id] = null;
-            btn.textContent = '🔴 Volver a Grabar';
+
+            if (recognitionInstances[id]) {
+                recognitionInstances[id].stop();
+            }
+
+            const itemConfig = examQuestions.find(e => e.id === id);
+            let attemptsDone = speakingAttempts[id];
+            let remaining = itemConfig.maxAttempts - attemptsDone;
+
+            if (attemptsDone < itemConfig.maxAttempts) {
+                btn.textContent = `🔴 Volver a Grabar (Te quedan ${remaining} intentos)`;
+            } else {
+                btn.textContent = `🔒 Intentos agotados (${itemConfig.maxAttempts}/${itemConfig.maxAttempts})`;
+                btn.disabled = true;
+                btn.style.background = 'var(--border)';
+            }
             btn.style.background = '';
         }
     }
@@ -840,6 +933,9 @@
         } else if (item.type === 'textarea') {
             const val = answers[item.id] || '';
             html += `<div style="margin-top: 15px;"><textarea rows="5" placeholder="Escribe tu respuesta aquí..." oninput="saveAnswer('${item.id}', this.value)">${val}</textarea></div>`;
+        } else if (item.type === 'transcription') {
+            const val = answers[item.id] || '';
+            html += `<div style="margin-top: 15px;"><textarea rows="6" placeholder="Escribe aquí la transcripción del audio..." oninput="saveAnswer('${item.id}', this.value)">${val}</textarea></div>`;
         }
 
         html += `</div>`;
@@ -865,10 +961,10 @@
                     return false;
                 }
             }
-        } else if (item.type === 'textarea') {
+        } else if (item.type === 'textarea' || item.type === 'transcription') {
             const val = answers[item.id];
             if (!val || val.trim().length === 0) {
-                alert('⚠️ Por favor escribe tu respuesta en el cuadro de texto antes de continuar.');
+                alert('⚠️ Por favor escribe tu respuesta antes de continuar.');
                 return false;
             }
         } else if (item.type === 'speaking') {
@@ -904,26 +1000,78 @@
         }
     }
 
+    function getCefrByScore(score) {
+        if (score >= 85) return 'C1 Avanzado';
+        if (score >= 70) return 'B2 Intermedio Alto';
+        if (score >= 55) return 'B1 Intermedio';
+        if (score >= 40) return 'A2 Básico';
+        return 'A1 Principiante';
+    }
+
     function finishExam() {
+        // 1. Reading Score
         let rc = 0, rt = 0;
         examQuestions.filter(e => e.section === 'Reading').forEach(item => {
             item.questions.forEach(q => { rt++; if (answers[q.id] === q.correct) rc++; });
         });
         const scoreReading = Math.round((rc / rt) * 100);
 
+        // 2. Listening Score
         let lc = 0, lt = 0;
-        examQuestions.filter(e => e.section === 'Listening').forEach(item => {
+        examQuestions.filter(e => e.section === 'Listening' && e.questions).forEach(item => {
             item.questions.forEach(q => { lt++; if (answers[q.id] === q.correct) lc++; });
         });
-        const scoreListening = Math.round((lc / lt) * 100);
+        const scoreAudioMC = lt > 0 ? (lc / lt) * 100 : 0;
 
-        let wc = 0, wf = 0;
+        const audio1Item = examQuestions.find(e => e.id === 'l1_transcription');
+        const userTranscription = (answers['l1_transcription'] || '').toLowerCase();
+        let matchedWordsCount = 0;
+        if (audio1Item && audio1Item.referenceWords) {
+            audio1Item.referenceWords.forEach(word => {
+                if (userTranscription.includes(word)) matchedWordsCount++;
+            });
+            var scoreAudio1 = Math.round((matchedWordsCount / audio1Item.referenceWords.length) * 100);
+        } else {
+            var scoreAudio1 = 0;
+        }
+        const scoreListening = Math.round((scoreAudio1 + scoreAudioMC) / 2);
+
+        // 3. Writing Score
+        let totalWritingScore = 0;
+        let writingExercisesCount = 0;
+
         examQuestions.filter(e => e.section === 'Writing').forEach(item => {
-            wc++; if (answers[item.id] && answers[item.id].trim().length > 10) wf++;
-        });
-        const scoreWriting = Math.round((wf / wc) * 85) + 15;
+            writingExercisesCount++;
+            const userText = (answers[item.id] || '').toLowerCase().trim();
 
-        // CÁLCULO DE SPEAKING: Si completa los 3 es 85, parcial 60, y por defecto no pasa de 40
+            if (item.id === 'w_ex12') {
+                let exerciseScore = 0;
+                if (userText.length < 15) {
+                    exerciseScore = 20;
+                } else {
+                    const hasFutureGrammar = item.futureStructures.some(s => userText.includes(s));
+                    exerciseScore += hasFutureGrammar ? 40 : 15;
+
+                    let matchedVerbsCount = 0;
+                    item.goalVerbs.forEach(v => { if (userText.includes(v)) matchedVerbsCount++; });
+                    if (matchedVerbsCount >= 2) exerciseScore += 40;
+                    else if (matchedVerbsCount === 1) exerciseScore += 25;
+                    else exerciseScore += 10;
+
+                    if (userText.length > 50) exerciseScore += 20;
+                }
+                totalWritingScore += Math.min(100, exerciseScore);
+            } else {
+                if (userText.length > 10) {
+                    totalWritingScore += 85;
+                } else {
+                    totalWritingScore += 30;
+                }
+            }
+        });
+        const scoreWriting = Math.round(totalWritingScore / writingExercisesCount);
+
+        // 4. Speaking Score
         let sd = 0;
         ['sp_ex1', 'sp_ex2', 'sp_ex3'].forEach(id => { 
             if (speakingRecordings[id] && speakingRecordings[id].size > 1000) sd++; 
@@ -931,27 +1079,38 @@
         const scoreSpeaking = sd === 3 ? 85 : (sd > 0 ? 60 : 40);
 
         const overall = Math.round((scoreReading + scoreWriting + scoreListening + scoreSpeaking) / 4);
-        let cefr = overall >= 85 ? 'C1' : overall >= 70 ? 'B2' : overall >= 55 ? 'B1' : overall >= 40 ? 'A2' : 'A1';
+        let cefrFull = getCefrByScore(overall);
 
         document.getElementById('step-exam').classList.add('hidden');
         document.getElementById('step-report').classList.remove('hidden');
 
-        document.getElementById('reportLevelBadge').textContent = `NIVEL: ${cefr}`;
-        document.getElementById('reportDate').textContent = `Fecha: ${new Date().toLocaleDateString()}`;
+        // Actualizar datos visuales del certificado
         document.getElementById('repName').textContent = studentData.name;
         document.getElementById('repLocation').textContent = `${studentData.city}, ${studentData.country}`;
+        document.getElementById('reportDate').textContent = new Date().toLocaleDateString();
 
-        document.getElementById('scoreReading').textContent = `${scoreReading}/100`;
-        document.getElementById('scoreWriting').textContent = `${scoreWriting}/100`;
-        document.getElementById('scoreListening').textContent = `${scoreListening}/100`;
-        document.getElementById('scoreSpeaking').textContent = `${scoreSpeaking}/100`;
+        document.getElementById('certScoreBig').textContent = `${overall}/100`;
+        document.getElementById('certLevelText').textContent = cefrFull;
 
-        document.getElementById('abilityDescription').textContent = `El estudiante demuestra un nivel general ${cefr} basado en el promedio de las 4 habilidades evaluadas.`;
-        document.getElementById('improvementDescription').textContent = "Continuar fortaleciendo fluidez y precisión gramatical en las destrezas con menor puntaje.";
+        // Círculos y etiquetas de habilidades
+        document.getElementById('circleReading').textContent = scoreReading;
+        document.getElementById('labelReading').textContent = getCefrByScore(scoreReading);
+
+        document.getElementById('circleListening').textContent = scoreListening;
+        document.getElementById('labelListening').textContent = getCefrByScore(scoreListening);
+
+        document.getElementById('circleWriting').textContent = scoreWriting;
+        document.getElementById('labelWriting').textContent = getCefrByScore(scoreWriting);
+
+        document.getElementById('circleSpeaking').textContent = scoreSpeaking;
+        document.getElementById('labelSpeaking').textContent = getCefrByScore(scoreSpeaking);
+
+        document.getElementById('abilityDescription').textContent = `El estudiante demuestra un nivel general equivalente a ${cefrFull}, evaluando de forma integral sus competencias en comprensión y producción.`;
+        document.getElementById('improvementDescription').textContent = "Se aconseja reforzar la habilidad con menor puntuación mediante práctica guiada y retroalimentación directa.";
 
         const isSincelejo = studentData.city.toLowerCase().includes('sincelejo');
         document.getElementById('recommendedServiceText').innerHTML = isSincelejo 
-            ? "Basado en tu ubicación (Sincelejo), te recomendamos: <strong>Paquete Presencial o Mixto (2 o 3 veces/semana)</strong> para mayor inmersión."
+            ? "Basado en tu ubicación (Sincelejo), te recomendamos: <strong>Paquete Presencial o Mixto (2 o 3 veces/semana)</strong> para mayor inmersión y práctica conversacional."
             : `Basado en tu ubicación (${studentData.city}), te recomendamos idealmente nuestros servicios online: <strong>Paquete Virtual (3 veces/semana)</strong> o <strong>Clase Particular (Virtual)</strong>.`;
 
         localStorage.removeItem('placement_student');
