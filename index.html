@@ -795,7 +795,7 @@
     let speakingRecordings = {};
     let activeMediaRecorders = {};
     let speakingAttempts = { sp_ex1: 0, sp_ex2: 0, sp_ex3: 0 };
-    let audioVolumeLevels = {}; // Control de volumen anti-silencio
+    let speakingScores = { sp_ex1: 0, sp_ex2: 0, sp_ex3: 0 }; // Puntuación real basada en análisis de voz
 
     function toggleSpeakingRecording(id) {
         const btn = document.getElementById(`recBtn_${id}`);
@@ -809,7 +809,9 @@
             }
 
             navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
-                // Configurar analizador de audio en tiempo real para detectar silencio
+                let speechActivityCount = 0; // Conteo de muestras con voz real
+                let totalSamples = 0;
+
                 try {
                     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                     const source = audioCtx.createMediaStreamSource(stream);
@@ -818,18 +820,24 @@
                     source.connect(analyzer);
                     const dataArray = new Uint8Array(analyzer.frequencyBinCount);
                     
-                    let totalVolume = 0;
-                    let samplesCount = 0;
                     const volInterval = setInterval(() => {
                         analyzer.getByteFrequencyData(dataArray);
                         let sum = 0;
                         for(let i=0; i<dataArray.length; i++) { sum += dataArray[i]; }
-                        totalVolume += (sum / dataArray.length);
-                        samplesCount++;
+                        let avg = sum / dataArray.length;
+                        totalSamples++;
+                        
+                        // Umbral estricto: la voz humana genera picos mayores a 12 en frecuencia de audio
+                        if (avg > 12) {
+                            speechActivityCount++;
+                        }
                     }, 200);
                     
                     window[`vol_interval_${id}`] = volInterval;
-                    window[`vol_data_${id}`] = () => (samplesCount > 0 ? (totalVolume / samplesCount) : 0);
+                    window[`vol_check_${id}`] = () => {
+                        if (totalSamples === 0) return 0;
+                        return (speechActivityCount / totalSamples); // Porcentaje de tiempo que realmente habló
+                    };
                 } catch(e) { console.log(e); }
 
                 let chunks = [];
@@ -837,18 +845,25 @@
                 recorder.ondataavailable = e => chunks.push(e.data);
                 recorder.onstop = () => {
                     if (window[`vol_interval_${id}`]) clearInterval(window[`vol_interval_${id}`]);
-                    const avgVol = window[`vol_data_${id}`] ? window[`vol_data_${id}`]() : 50;
+                    const speechRatio = window[`vol_check_${id}`] ? window[`vol_check_${id}`]() : 0;
 
                     const blob = new Blob(chunks, { type: 'audio/webm' });
                     
-                    // FILTRO ANTI-SILENCIO: Si el volumen promedio es menor a 2.5, se considera silencio o sin voz
-                    if (blob.size > 1500 && avgVol > 2.5) {
+                    // EVALUACIÓN REAL: Se exige que al menos el 25% de la grabación tenga actividad de voz real
+                    if (blob.size > 2000 && speechRatio > 0.25) {
                         speakingRecordings[id] = blob;
-                        status.textContent = '✅ Grabación analizada y guardada exitosamente.';
+                        speakingScores[id] = 85; // Buena nota si habló de verdad
+                        status.textContent = '✅ Audio evaluado: ¡Voz clara detectada!';
                         status.style.color = 'var(--success)';
+                    } else if (blob.size > 1000 && speechRatio > 0.10) {
+                        speakingRecordings[id] = blob;
+                        speakingScores[id] = 55; // Nota media si habló muy poco o bajito
+                        status.textContent = '⚠️ Audio débil o corto. Se detectó poca voz.';
+                        status.style.color = '#d97706';
                     } else {
-                        speakingRecordings[id] = null; // Anular la grabación
-                        status.textContent = '⚠️ Audio en silencio detectado. No se registró voz válida, grabe de nuevo.';
+                        speakingRecordings[id] = null;
+                        speakingScores[id] = 30; // Nota baja por silencio o ruido vacío
+                        status.textContent = '❌ Silencio detectado. No se registró voz clara, intente de nuevo.';
                         status.style.color = 'var(--error)';
                     }
                 };
@@ -859,7 +874,7 @@
 
                 btn.textContent = '⏹️ Detener Grabación';
                 btn.style.background = 'var(--error)';
-                status.textContent = `🔴 Grabando intento ${speakingAttempts[id]} de ${item.maxAttempts}... Habla claro.`;
+                status.textContent = `🔴 Grabando intento ${speakingAttempts[id]} de ${item.maxAttempts}... Hable claro.`;
 
             }).catch(() => alert('Error de acceso al micrófono.'));
         } else {
@@ -954,8 +969,8 @@
                 return false;
             }
         } else if (item.type === 'speaking') {
-            if (!speakingRecordings[item.id] || speakingRecordings[item.id].size < 1500) {
-                alert('⚠️ No se detectó una grabación de voz válida o el audio está en silencio. Debes grabar tu voz para continuar.');
+            if (!speakingRecordings[item.id] || speakingScores[item.id] < 50) {
+                alert('⚠️ No se detectó una voz válida o clara en la grabación. Por favor graba tu voz hablando en voz alta para poder avanzar.');
                 return false;
             }
         }
@@ -1054,11 +1069,8 @@
         });
         const scoreWriting = Math.round(totalWritingScore / writingExercisesCount);
 
-        let sd = 0;
-        ['sp_ex1', 'sp_ex2', 'sp_ex3'].forEach(id => { 
-            if (speakingRecordings[id] && speakingRecordings[id].size > 1500) sd++; 
-        });
-        const scoreSpeaking = sd === 3 ? 85 : (sd > 0 ? 60 : 30); // Si dejas silencio, baja fuertemente
+        // Promedio de las calificaciones reales de speaking obtenidas en cada ejercicio
+        const scoreSpeaking = Math.round((speakingScores.sp_ex1 + speakingScores.sp_ex2 + speakingScores.sp_ex3) / 3);
 
         const overall = Math.round((scoreReading + scoreWriting + scoreListening + scoreSpeaking) / 4);
         let cefrFull = getCefrByScore(overall);
